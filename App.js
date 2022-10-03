@@ -13,12 +13,20 @@ import Staff from './screens/Staff';
 import Clients from './screens/Clients';
 import ViewClient from './screens/ViewClient';
 import Dues from './screens/Dues';
-
+import SplashScreen from 'react-native-splash-screen';
+import mobileAds from 'react-native-google-mobile-ads';
 const Stack = createNativeStackNavigator();
 
 function App() {
   const scheme = useColorScheme();
-
+  React.useEffect(() => {
+    setTimeout(() => SplashScreen.hide(), 200);
+    mobileAds()
+      .initialize()
+      .then(adapterStatuses => {
+        console.log(adapterStatuses);
+      });
+  }, []);
   return (
     <NavigationContainer theme={scheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack.Navigator

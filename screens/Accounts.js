@@ -4,8 +4,11 @@ import {BasicPage} from '../components/basicpage';
 import TextBox from '../components/textbox';
 import {Box} from './HomeScreen';
 import {addCountListener, sumAmount} from '../models/policies';
+import {BannerAd, BannerAdSize, TestIds} from 'react-native-google-mobile-ads';
+import {ACCOUNTSAD} from '@env';
 
 const Accounts = ({navigation}) => {
+  const adUnitId = __DEV__ ? TestIds.BANNER : ACCOUNTSAD;
   const [year, setYear] = React.useState('');
   const [commission, setCommission] = React.useState(0);
   const [tax, setTax] = React.useState(0);
@@ -119,6 +122,13 @@ const Accounts = ({navigation}) => {
             }}
           />
         </View>
+        <BannerAd
+          unitId={adUnitId}
+          size={BannerAdSize.LARGE_BANNER}
+          requestOptions={{
+            requestNonPersonalizedAdsOnly: true,
+          }}
+        />
         <View className="space-x-2 mt-2 space-2 flex items-center  flex-row flex-nowrap">
           <Box title="Business" back="bg-yellow-500">
             {parseFloat(amount).toFixed(0)}

@@ -200,12 +200,27 @@ export function searchListener(setFunction, text) {
     };
   });
 }
+export function createPolicyinBulk(data) {
+  try {
+    const realm = new Realm(config);
+    data.map(elem => {
+      realm.write(() => {
+        realm.create('Khata', {
+          _id: String(new UUID()),
+          ...elem,
+        });
+      });
+    });
 
+    realm.close();
+  } catch (error) {
+    console.log('An error occured', error);
+  }
+}
 export function createNewPolicy(data) {
   try {
     const realm = new Realm(config);
     realm.write(() => {
-      console.log(data);
       realm.create('Khata', {
         _id: String(new UUID()),
         ...data,

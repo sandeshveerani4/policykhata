@@ -9,6 +9,7 @@ import {
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import * as React from 'react';
 import {
+  Alert,
   ScrollView,
   Text,
   TouchableOpacity,
@@ -16,7 +17,11 @@ import {
   View,
 } from 'react-native';
 import {BasicPage} from '../components/basicpage';
-import {addCountListener, addSumListener} from '../models/policies';
+import {
+  addCountListener,
+  addSumListener,
+  createPolicyinBulk,
+} from '../models/policies';
 import {
   useInterstitialAd,
   BannerAd,
@@ -24,7 +29,16 @@ import {
   TestIds,
 } from 'react-native-google-mobile-ads';
 import {HOMESCREEN_AD, INTERAD} from '@env';
-
+import Button from '../components/button';
+import {getPolicies} from '../models/policies';
+import {DownloadDirectoryPath, writeFile} from 'react-native-fs';
+import DocumentPicker, {
+  DirectoryPickerResponse,
+  DocumentPickerResponse,
+  isInProgress,
+  types,
+} from 'react-native-document-picker';
+import RNFS from 'react-native-fs';
 const adUnitId = __DEV__ ? TestIds.BANNER : HOMESCREEN_AD;
 export const Box = ({children, title, back, box, ...props}) => (
   <View
@@ -52,6 +66,18 @@ const HomeScreen = ({navigation}) => {
       requestNonPersonalizedAdsOnly: true,
     },
   );
+  const saveFile = async () => {
+    const path = `${DownloadDirectoryPath}/PolicyKhataBackup${Date.now()}.backup`;
+    console.log(path);
+    try {
+      await writeFile(path, JSON.stringify(getPolicies()), 'utf8');
+      Alert.alert('File saved', 'Data has been saved to: ' + path, [
+        {text: 'OK'},
+      ]);
+    } catch (e) {
+      console.log('error', e);
+    }
+  };
   const [goToScreen, setgts] = React.useState('');
   React.useEffect(() => {
     // Start loading the interstitial straight away
@@ -114,7 +140,10 @@ const HomeScreen = ({navigation}) => {
           </Box>
         </View>
         {/* */}
-        <View className="mt-10 flex items-center mx-2 flex-row">
+        <Text className="my-5 text-center">
+          Press Top Left Button To Refresh the Stats.
+        </Text>
+        <View className="flex items-center mx-2 flex-row">
           <Box box={true}>
             <TouchableOpacity
               onPress={() => {
@@ -155,7 +184,7 @@ const HomeScreen = ({navigation}) => {
             </TouchableOpacity>
           </Box>
         </View>
-        <View className="mt-2 mb-20 space-2 flex items-center mx-2 flex-row">
+        <View className="mt-2 space-2 flex items-center mx-2 flex-row">
           <Box box={true}>
             <TouchableOpacity
               onPress={() => {
@@ -191,6 +220,34 @@ const HomeScreen = ({navigation}) => {
             </TouchableOpacity>
           </Box>
         </View>
+        <Button
+          text="Import Data"
+          onPress={async () => {
+            try {
+              const pickerResult = await DocumentPicker.pickSingle({
+                presentationStyle: 'fullScreen',
+                copyTo: 'cachesDirectory',
+              });
+              console.log(pickerResult);
+              const jjdata = await RNFS.readFile(
+                pickerResult['fileCopyUri'],
+                'utf8',
+              );
+              createPolicyinBulk(JSON.parse(jjdata));
+            } catch (e) {
+              !DocumentPicker.isCancel(e) && !isInProgress(e)
+                ? Alert.alert(
+                    'An Error Occured. Make sure you attach valid backup file.',
+                  )
+                : '';
+            }
+          }}
+        />
+        <Button
+          className="mb-20 bg-red-600"
+          text="Export Data"
+          onPress={saveFile}
+        />
       </ScrollView>
       <View className="absolute bottom-2 w-full flex items-center">
         <TouchableOpacity

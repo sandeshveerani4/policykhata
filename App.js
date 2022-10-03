@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {useColorScheme} from 'react-native';
+import {Alert, useColorScheme} from 'react-native';
 import {
   NavigationContainer,
   DefaultTheme,
@@ -15,16 +15,26 @@ import ViewClient from './screens/ViewClient';
 import Dues from './screens/Dues';
 import SplashScreen from 'react-native-splash-screen';
 import mobileAds from 'react-native-google-mobile-ads';
+
+
 const Stack = createNativeStackNavigator();
 
 function App() {
   const scheme = useColorScheme();
+  
   React.useEffect(() => {
     setTimeout(() => SplashScreen.hide(), 200);
     mobileAds()
-      .initialize()
-      .then(adapterStatuses => {
-        console.log(adapterStatuses);
+      .setRequestConfiguration({
+        // An array of test device IDs to add to the allow list.
+        testDeviceIdentifiers: ['B242AE6AE672718DBA60304AD1A45076', 'EMULATOR'],
+      })
+      .then(() => {
+        mobileAds()
+          .initialize()
+          .then(adapterStatuses => {
+            console.log(adapterStatuses);
+          });
       });
   }, []);
   return (

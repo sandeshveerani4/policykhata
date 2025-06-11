@@ -1,0 +1,1 @@
+Android app using React Native and Realm for local DB designed for brokers to digitally manage insurance policy clients, allowing them to add or modify client profiles, get alerts on pending dues, calculate profits and taxes, and manage payment dates having 5k+ downloads on Google PlayStore
